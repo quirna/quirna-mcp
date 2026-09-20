@@ -44,6 +44,27 @@ if ! grep -q "^## \\[$version\\]" CHANGELOG.md; then
 fi
 
 bun test src
+
+# In the monorepo, `bun run build` compiles against the ROOT lockfile, which
+# pins one version of every transitive dependency. The mirror has no lockfile,
+# so it resolves ranges fresh — and so does anyone who installs this package.
+# The two trees can differ, and when they do this script passes here and fails
+# there, after the tag has already been pushed.
+#
+# That is not hypothetical: @quirna/mcp asked for `zod: ^3.25.0` while
+# @modelcontextprotocol/sdk asks for `^3.25 || ^4.0`. The root lockfile flattened
+# both to one copy of Zod 3; a fresh resolve gave the SDK its own Zod 4, and the
+# build failed on types that had never been compiled that way here.
+#
+# So build once the way a fresh clone would, before trusting the local build.
+if [ -f ../../bun.lock ]; then
+  echo "--- isolated build (resolving ranges with no lockfile, as the mirror does)"
+  iso="$(mktemp -d)"
+  rsync -a --exclude .git --exclude node_modules --exclude dist --exclude '*.tgz' ./ "$iso/"
+  (cd "$iso" && bun install --silent && bun run build)
+  rm -rf "$iso"
+fi
+
 bun run build
 
 work="$(mktemp -d)"
