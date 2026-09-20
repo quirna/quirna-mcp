@@ -1,0 +1,64 @@
+# Publishes @quirna/mcp to npm when a v<version> tag lands on this repo.
+#
+# This file is maintained in the Quirna monorepo and copied here by the sync;
+# edits made directly in this repo are overwritten on the next sync.
+#
+# Publishing happens here, not in the monorepo, because npm checks that the
+# workflow's repository matches `repository.url` in package.json, and that is
+# this public repo. Being public is also what lets npm attach provenance.
+name: Publish to npm
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      # OIDC token for npm trusted publishing and provenance.
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.0"
+
+      # Trusted publishing needs npm >= 11.5.1, which ships with Node 24.
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Tag matches package.json
+        run: |
+          version="$(node -p 'require("./package.json").version')"
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::tag $GITHUB_REF_NAME does not match package.json version $version"
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Release check
+        run: scripts/release-check.sh
+
+      # Uses trusted publishing (OIDC) once it's configured on npmjs.com. The
+      # very first publish can't: npm only lets you configure a trusted
+      # publisher on a package that already exists. For that one run, an
+      # NPM_TOKEN secret is used if present; delete it afterwards.
+      - name: Publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public

@@ -1,0 +1,59 @@
+{
+  "name": "@quirna/mcp",
+  "version": "0.1.0",
+  "description": "Ask a human before your agent acts. Quirna's Model Context Protocol server.",
+  "license": "MIT",
+  "homepage": "https://quirna.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/quirna/quirna-mcp.git"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "approval",
+    "human-in-the-loop",
+    "agent-authorization",
+    "quirna"
+  ],
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md"
+  ],
+  "bin": {
+    "quirna-mcp": "./dist/bin.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "prebuild": "if [ -d ../sdk ]; then cd ../sdk && bun run build; fi",
+    "build": "rm -rf dist && bun build ./src/bin.ts ./src/index.ts --outdir dist --target node --format esm --packages external && tsc -p tsconfig.build.json",
+    "prepublishOnly": "bun run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@quirna/sdk": "^0.1.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.3"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "bugs": {
+    "url": "https://github.com/quirna/quirna-mcp/issues"
+  }
+}
