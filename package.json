@@ -1,6 +1,7 @@
 {
   "name": "@quirna/mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
+  "mcpName": "io.github.quirna/mcp",
   "description": "Ask a human before your agent acts. Quirna's Model Context Protocol server.",
   "license": "MIT",
   "homepage": "https://quirna.com",
@@ -24,7 +25,8 @@
     "dist",
     "CHANGELOG.md",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "server.json"
   ],
   "bin": {
     "quirna-mcp": "./dist/bin.js"

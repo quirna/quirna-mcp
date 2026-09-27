@@ -26,6 +26,19 @@ if ! grep -q "export const SERVER_VERSION = \"$version\";" src/server.ts; then
   exit 1
 fi
 
+# The MCP Registry refuses a server.json that disagrees with the npm package it
+# points at, and it checks only after npm has already published — so a mismatch
+# here would ship a version that never reaches the registry.
+if [ "$(node -p 'require("./server.json").name')" != "$(node -p 'require("./package.json").mcpName')" ]; then
+  echo "::error::server.json name must equal package.json mcpName"
+  exit 1
+fi
+if [ "$(node -p 'require("./server.json").version')" != "$version" ] \
+  || [ "$(node -p 'require("./server.json").packages[0].version')" != "$version" ]; then
+  echo "::error::server.json version and packages[0].version must both be $version"
+  exit 1
+fi
+
 # npm only generates provenance, and only accepts a trusted publisher, when the
 # repository running the publish equals `repository.url` (ADR-0020). The publish
 # runs in the mirror, so this must name the mirror and not the monorepo's other

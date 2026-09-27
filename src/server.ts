@@ -41,7 +41,7 @@ export type ApprovalsClient = {
 const TIER_VALUES = [...TIERS] as [Tier, ...Tier[]];
 
 export const SERVER_NAME = "quirna";
-export const SERVER_VERSION = "0.1.0";
+export const SERVER_VERSION = "0.1.1";
 
 const REQUEST_DESCRIPTION = [
   "Ask a human to authorize an action before you take it, and wait for their answer.",

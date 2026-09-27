@@ -13,6 +13,14 @@ editing.
 Releases are cut with the *MCP* workflow — see
 [ADR-0030](../../docs/adr/0030-servidor-mcp.md).
 
+## [0.1.1] — 2026-09-27
+
+### Added
+
+- Listed in the official MCP Registry as `io.github.quirna/mcp`. The package
+  now carries `mcpName` and ships a `server.json`; the tools and their text are
+  unchanged.
+
 ## [0.1.0] — 2026-09-20
 
 First release.

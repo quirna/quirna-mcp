@@ -1,0 +1,45 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.quirna/mcp",
+  "title": "Quirna",
+  "description": "Ask a human before your agent acts: approval requests decided on a phone.",
+  "websiteUrl": "https://quirna.com",
+  "repository": {
+    "url": "https://github.com/quirna/quirna-mcp",
+    "source": "github"
+  },
+  "version": "0.1.1",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@quirna/mcp",
+      "version": "0.1.1",
+      "transport": { "type": "stdio" },
+      "environmentVariables": [
+        {
+          "name": "QUIRNA_API_KEY",
+          "description": "Key of a System registered in the Quirna Console (Users → Systems).",
+          "isRequired": true,
+          "isSecret": true
+        },
+        {
+          "name": "QUIRNA_REQUESTER_ID",
+          "description": "Who the Console shows as having asked. Defaults to \"mcp\"."
+        },
+        {
+          "name": "QUIRNA_REQUESTER_NAME",
+          "description": "Display name for the requester. Defaults to \"AI agent\"."
+        },
+        {
+          "name": "QUIRNA_ENVIRONMENT",
+          "description": "Environment used when a tool call names none. Empty means the org default."
+        },
+        {
+          "name": "QUIRNA_WAIT_MS",
+          "description": "How long a tool call waits for a decision before returning pending. Defaults to 90000."
+        },
+        { "name": "QUIRNA_BASE_URL", "description": "Override the Quirna API URL. Leave unset." }
+      ]
+    }
+  ]
+}

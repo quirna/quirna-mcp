@@ -62,3 +62,17 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --provenance --access public
+
+      # Lists the version just published in the official MCP Registry
+      # (registry.modelcontextprotocol.io). The registry verifies ownership two
+      # ways: the OIDC token proves this run belongs to the quirna GitHub org,
+      # which owns the io.github.quirna/ namespace, and it reads `mcpName` from
+      # the package npm now serves. No secret and no interactive login.
+      - name: Install mcp-publisher
+        run: |
+          curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz" | tar xz mcp-publisher
+
+      - name: Publish to the MCP Registry
+        run: |
+          ./mcp-publisher login github-oidc
+          ./mcp-publisher publish
