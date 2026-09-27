@@ -61,18 +61,39 @@ jobs:
       - name: Publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish --provenance --access public
+        # Skipped when the version is already on npm, so that re-running this
+        # job after a failed registry step only retries the registry.
+        run: |
+          version="$(node -p 'require("./package.json").version')"
+          if npm view "@quirna/mcp@$version" version >/dev/null 2>&1; then
+            echo "@quirna/mcp@$version already on npm; skipping"
+          else
+            npm publish --provenance --access public
+          fi
 
       # Lists the version just published in the official MCP Registry
       # (registry.modelcontextprotocol.io). The registry verifies ownership two
       # ways: the OIDC token proves this run belongs to the quirna GitHub org,
       # which owns the io.github.quirna/ namespace, and it reads `mcpName` from
       # the package npm now serves. No secret and no interactive login.
+      #
+      # Pinned rather than `latest`: this binary runs holding a token that can
+      # publish under our namespace.
       - name: Install mcp-publisher
+        env:
+          MCP_PUBLISHER_VERSION: v1.8.1
         run: |
-          curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz" | tar xz mcp-publisher
+          curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/download/$MCP_PUBLISHER_VERSION/mcp-publisher_linux_amd64.tar.gz" | tar xz mcp-publisher
 
       - name: Publish to the MCP Registry
+        # The registry checks npm for the version, and a version npm has just
+        # accepted takes a while to show up there: the 0.1.1 release failed
+        # with a 404 half a second after publishing. Retry for ~5 minutes.
         run: |
           ./mcp-publisher login github-oidc
-          ./mcp-publisher publish
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            ./mcp-publisher publish && exit 0
+            echo "attempt $attempt failed; retrying in 30s"
+            sleep 30
+          done
+          exit 1

@@ -1,6 +1,6 @@
 {
   "name": "@quirna/mcp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "mcpName": "io.github.quirna/mcp",
   "description": "Ask a human before your agent acts. Quirna's Model Context Protocol server.",
   "license": "MIT",

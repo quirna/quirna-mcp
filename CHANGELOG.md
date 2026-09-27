@@ -13,6 +13,14 @@ editing.
 Releases are cut with the *MCP* workflow — see
 [ADR-0030](../../docs/adr/0030-servidor-mcp.md).
 
+## [0.1.2] — 2026-09-27
+
+### Fixed
+
+- 0.1.1 reached npm but not the MCP Registry: the registry looked the version
+  up on npm before npm served it. The release now retries, and this version is
+  the first one listed. No change to the package itself.
+
 ## [0.1.1] — 2026-09-27
 
 ### Added
